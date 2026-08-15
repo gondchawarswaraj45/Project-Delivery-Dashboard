@@ -40,51 +40,73 @@ def extract_structured_update(raw_text: str, current_status: str, target_date: s
 def _extract_with_groq(raw_text: str, current_status: str, target_date: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Extracts structured project updates using the official Groq SDK with ultra-low latency Llama-3.
+    Intelligently handles ANY message domain (payments, access, technical, contracts, blockers, resolutions).
     """
+    # pyrefly: ignore [missing-import]
     from groq import Groq
 
     client = Groq(api_key=GROQ_API_KEY)
     task_catalog = "\n".join([f"- {t['title']} (Current status: {t.get('status', 'NOT_STARTED')})" for t in tasks])
 
     system_prompt = (
-        "You are an expert Project Delivery AI Assistant. "
-        "Analyze raw unstructured delivery communications (emails, Slack messages, call transcripts) "
-        "and extract structured JSON status updates with high precision."
+        "You are an expert Enterprise Project Delivery & Portfolio Intelligence AI Assistant. "
+        "Your task is to analyze ANY raw unstructured delivery communication — including emails, Slack messages, "
+        "client call transcripts, payment/commercial notifications, security updates, hardware shipments, and user feedback — "
+        "and translate it into an accurate, structured project state update."
     )
 
     user_prompt = f"""
-Analyze this raw unstructured delivery communication:
+Analyze this unstructured communication and determine its impact on the project state:
 
 RAW COMMUNICATION:
 \"\"\"{raw_text}\"\"\"
 
 CURRENT PROJECT CONTEXT:
-- Current Overall Health: {current_status}
+- Current Overall Project Health: {current_status}
 - Current Target Delivery Date: {target_date}
-- Known Project Tasks:
+- Known Project Tasks in Delivery Hierarchy:
 {task_catalog}
 
-INSTRUCTIONS:
-1. Match mentioned tasks against the catalog and detect their updated status: DONE, IN_PROGRESS, BLOCKED, or NOT_STARTED.
-2. If a task is BLOCKED, extract the technical blocker reason.
-3. Determine the updated overall project health: ON_TRACK, AT_RISK, BLOCKED, or COMPLETED.
-4. Predict the expected completion date in YYYY-MM-DD format (use current target date {target_date} as base).
-5. Write a sanitized, professional executive summary suitable for a customer-facing client portal (do not expose internal friction or sensitive credentials issues directly).
+BUSINESS LOGIC & DOMAIN INSTRUCTIONS:
+1. SEMANTIC TASK MAPPING:
+   - Match explicitly or implicitly affected tasks from the catalog.
+   - For example:
+     * Payments done / invoice paid / contract signed -> Updates 'Customer approval signoff' or 'Requirements gathering' or commercial milestones to DONE.
+     * Started using dashboard / login successful / UI tested -> Updates 'Mission dispatch setup' or 'Admin training' or 'Integration testing' to IN_PROGRESS or DONE.
+     * Credentials delivered / tokens provided / firewall approved -> Clears blockers on 'API configuration' or 'Mission dispatch setup' and moves them to DONE or IN_PROGRESS.
+     * Hardware arrived / PLC setup finished -> Updates hardware tasks to DONE.
+     * Bug reported / delay flagged / credentials missing / waiting -> Marks affected tasks as BLOCKED with specific blocker reason.
+
+2. RESOLUTION & UNBLOCKING:
+   - If the message reports a resolution (e.g. "payment done", "credentials sent", "tested and working"), UNBLOCK any previously blocked tasks.
+   - If all major blockers are resolved, set "blockers": [] and upgrade overall project health to "ON_TRACK" (or "COMPLETED" if all tasks are finished).
+
+3. OVERALL PROJECT HEALTH:
+   - "ON_TRACK": Deliverables proceeding smoothly, payments cleared, or blockers resolved.
+   - "AT_RISK": Minor dependencies pending, waiting on non-critical responses, or mild delays.
+   - "BLOCKED": Hard blocker preventing work (unauthorized, security rejection, missing credentials).
+   - "COMPLETED": All deliverables verified and project handed over to client.
+
+4. TARGET DATE PREDICTION:
+   - Predict the expected completion date in YYYY-MM-DD format (base: {target_date}).
+
+5. SANITIZED CUSTOMER-FACING SUMMARY:
+   - Provide a clean, positive, professional executive summary suitable for the customer portal (e.g. "Payment confirmed. Dashboard access initiated and active onboarding in progress.").
 
 Return ONLY a valid JSON object matching this schema:
 {{
     "project_status": "ON_TRACK" | "AT_RISK" | "BLOCKED" | "COMPLETED",
     "updates": [
         {{
-            "task": "exact task title from catalog",
+            "task": "exact matching task title from catalog",
             "status": "DONE" | "IN_PROGRESS" | "BLOCKED" | "NOT_STARTED",
-            "blocker": "internal blocker reason if blocked, else null"
+            "blocker": "blocker reason string if status is BLOCKED, else null"
         }}
     ],
-    "blockers": ["list of identified blocker strings"],
+    "blockers": ["array of unresolved blocker strings, or empty [] if none"],
     "expected_completion": "YYYY-MM-DD",
-    "confidence": 0.96,
-    "customer_summary": "Clean professional summary for client view"
+    "confidence": 0.95,
+    "customer_summary": "Professional executive summary for client portal"
 }}
 """
 
@@ -102,6 +124,7 @@ Return ONLY a valid JSON object matching this schema:
     result = json.loads(content)
     result["engine"] = f"Groq ({GROQ_MODEL})"
     return result
+
 
 
 def _extract_with_gemini(raw_text: str, current_status: str, target_date: str, tasks: List[Dict[str, Any]]) -> Dict[str, Any]:

@@ -169,45 +169,46 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
     setExtractedResult(null);
   };
 
-  // Handle Process Update
+  // Handle Process Update — extracts AI result AND immediately applies it to the dashboard
   const handleProcessUpdate = async () => {
     if (!rawText.trim()) return;
     setIsProcessing(true);
     setIsApplied(false);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/projects/${project.id}/ai-update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ raw_text: rawText }),
-      });
+      let result: StructuredUpdate | null = null;
 
-      if (response.ok) {
-        const data = await response.json();
-        setExtractedResult(data);
-      } else {
-        const fallback = extractStructuredUpdate(rawText, project, projectTasks);
-        setExtractedResult(fallback);
+      try {
+        const response = await fetch(`${API_BASE_URL}/projects/${project.id}/ai-update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ raw_text: rawText }),
+        });
+
+        if (response.ok) {
+          result = await response.json();
+        }
+      } catch {
+        // fall through to local NLP
       }
-    } catch {
-      const fallback = extractStructuredUpdate(rawText, project, projectTasks);
-      setExtractedResult(fallback);
-    } finally {
 
+      if (!result) {
+        result = extractStructuredUpdate(rawText, project, projectTasks);
+      }
+
+      setExtractedResult(result);
+
+      // Immediately apply changes to the dashboard
+      await applyAIUpdate(project.id, result, rawText);
+      setIsApplied(true);
+    } catch (err) {
+      console.error('[AI Processor] Error during extraction/apply:', err);
+    } finally {
       setIsProcessing(false);
     }
   };
 
-  // Handle Apply Changes
-  const handleApplyChanges = async () => {
-    if (!extractedResult) return;
-    await applyAIUpdate(project.id, extractedResult, rawText);
-    setIsApplied(true);
-    setTimeout(() => {
-      setExtractedResult(null);
-      setIsApplied(false);
-    }, 1800);
-  };
+
 
   const activeSample = CHANNEL_SAMPLES.find((s) => s.channel === selectedChannel);
 
@@ -614,17 +615,29 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
             </div>
           )}
 
-          {/* Action Row: Reject / Discard vs Apply Changes */}
+          {/* Action Row: Applied banner + Dismiss/JSON */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '10px', borderTop: '1px solid rgba(139, 92, 246, 0.2)' }}>
+
+            {/* Applied confirmation badge — always shown since changes are auto-applied */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                color: '#10b981',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+              }}
+            >
+              <Check size={15} />
+              <span>✓ Changes Applied to Dashboard!</span>
+            </div>
+
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => setExtractedResult(null)}
-                style={{ fontSize: '0.82rem', padding: '7px 14px', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
-              >
-                ✕ Discard / Reject
-              </button>
               <button
                 type="button"
                 className="btn btn-ghost"
@@ -634,37 +647,15 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
                 <Code2 size={13} />
                 <span>{showJsonCode ? 'Hide JSON' : '{ } View JSON'}</span>
               </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => { setExtractedResult(null); setIsApplied(false); }}
+                style={{ fontSize: '0.82rem', padding: '7px 14px', color: 'var(--text-muted)', border: '1px solid var(--border-color)' }}
+              >
+                Dismiss
+              </button>
             </div>
-
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleApplyChanges}
-              disabled={isApplied}
-              style={{
-                fontSize: '0.88rem',
-                padding: '9px 24px',
-                background: isApplied ? '#10b981' : 'linear-gradient(135deg, #10b981, #059669)',
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontWeight: 800,
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
-              }}
-            >
-              {isApplied ? (
-                <>
-                  <Check size={16} />
-                  <span>State Synchronized to Project!</span>
-                </>
-              ) : (
-                <>
-                  <Check size={16} />
-                  <span>✓ Apply Changes to Project</span>
-                </>
-              )}
-            </button>
           </div>
 
           {/* JSON Schema Code Block */}
