@@ -193,9 +193,10 @@ def seed_data(cursor):
         ('p1', 'c1',
          'Drone Fleet Deployment',
          'Autonomous warehouse drone survey fleet deployment with live sensor feed telemetry integration.',
-         'ON_TRACK', '2026-08-01', '2026-08-30', 72, two_hours_ago,
+         'ON_TRACK', '2026-08-01', '2026-08-30', 44, two_hours_ago,
          'Customer API credentials pending for live telematics stream, but mock testing is completed.',
          'Integration testing is in progress. Drone navigation & waypoint dispatch systems verified.'),
+
         ('p2', 'c2',
          'Warehouse Automation',
          'AGV routing system & conveyor belt IoT telemetry stack setup across distribution hubs.',

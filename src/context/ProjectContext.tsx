@@ -148,67 +148,124 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
   };
 
-  // Apply AI Update
+  // Apply AI Update with immediate reactive state update and backend persistence
   const applyAIUpdate = async (projectId: string, structured: StructuredUpdate, rawText: string) => {
+    // 1. Detect Source Channel
+    const rawLower = rawText.toLowerCase();
+    let sourceChannel: 'AI' | 'User' | 'System' | 'Linear' | 'Email' | 'Slack' | 'Call' = 'AI';
+    if (rawLower.includes('subject:') || rawLower.includes('from:') || (rawLower.includes('@') && rawLower.includes('.in'))) {
+      sourceChannel = 'Email';
+    } else if (rawLower.includes('@channel') || rawLower.includes('slack') || rawLower.includes('#') || rawLower.includes('teams')) {
+      sourceChannel = 'Slack';
+    } else if (rawLower.includes('transcript') || rawLower.includes('zoom') || rawLower.includes('standup') || rawLower.includes('call')) {
+      sourceChannel = 'Call';
+    }
+
+
+    const currentProj = projects.find((p) => p.id === projectId);
+    const oldStatus = currentProj?.status || 'ON_TRACK';
+    const newStatus = structured.project_status || oldStatus;
+
+    // 2. Immediately update local React Project state
+    setProjects((prev) =>
+      prev.map((p) => {
+        if (p.id !== projectId) return p;
+        return {
+          ...p,
+          status: newStatus,
+          targetDate: structured.expected_completion || p.targetDate,
+          customerSummary: structured.customer_summary || p.customerSummary,
+          internalNotes: structured.blocker_summary
+            ? `AI Identified Blocker: ${structured.blocker_summary}`
+            : p.internalNotes,
+          lastUpdated: new Date().toISOString(),
+        };
+      })
+    );
+
+    // 3. Immediately update matching tasks
+    let updatedTasksList: Task[] = [];
+    const taskChangeDetails: string[] = [];
+
+    if (structured.updates && structured.updates.length > 0) {
+      setTasks((prevTasks) => {
+        const updated = prevTasks.map((t) => {
+          if (t.projectId !== projectId) return t;
+          const match = structured.updates?.find(
+            (u) =>
+              u.task.toLowerCase().trim() === t.title.toLowerCase().trim() ||
+              t.title.toLowerCase().includes(u.task.toLowerCase()) ||
+              u.task.toLowerCase().includes(t.title.toLowerCase())
+          );
+          if (match) {
+            taskChangeDetails.push(`${t.title}: ${t.status.replace('_', ' ')} → ${match.status.replace('_', ' ')}`);
+            return {
+              ...t,
+              status: match.status,
+              blocker: match.blocker || (match.status === 'BLOCKED' ? structured.blocker_summary || 'Blocked on dependency' : undefined),
+              customerBlockerReason: match.status === 'BLOCKED' ? (structured.customer_summary || 'Waiting for required access information.') : undefined,
+            };
+          }
+          return t;
+        });
+        updatedTasksList = updated;
+        recalculateProgress(projectId, updated);
+        return updated;
+      });
+    }
+
+    // 4. Create Rich Audit Activity Logs
+    const nowIso = new Date().toISOString();
+    const newActivities: Activity[] = [];
+
+    // Audit Event 1: AI Update Processed
+    const descText = taskChangeDetails.length > 0
+      ? taskChangeDetails.join(' • ')
+      : `AI parsed message. Health projected at ${newStatus.replace('_', ' ')}.`;
+
+    newActivities.push({
+      id: `act-${Date.now()}-1`,
+      projectId,
+      source: sourceChannel,
+      title: `🤖 AI Update Processed (Source: ${sourceChannel === 'Email' ? 'Customer Email' : sourceChannel === 'Slack' ? 'Slack / Teams' : sourceChannel === 'Call' ? 'Call Transcript' : 'Direct Message'})`,
+      description: descText,
+      timestamp: nowIso,
+      author: 'AI Ingestion Engine',
+      rawText,
+      changesApplied: true,
+      structuredUpdate: structured,
+    });
+
+    // Audit Event 2: Project Status Changed (if status transitioned)
+    if (newStatus !== oldStatus) {
+      newActivities.push({
+        id: `act-${Date.now()}-2`,
+        projectId,
+        source: 'AI',
+        title: `📊 Project Status Changed: ${oldStatus.replace('_', ' ')} → ${newStatus.replace('_', ' ')}`,
+        description: structured.blocker_summary
+          ? `Reason: New blocker detected by AI — ${structured.blocker_summary}`
+          : `Reason: AI analysis updated project delivery risk posture.`,
+        timestamp: new Date(Date.now() + 1000).toISOString(),
+        author: 'AI Ingestion Engine',
+        changesApplied: true,
+      });
+    }
+
+    setActivities((prev) => [...newActivities, ...prev]);
+
+    // 5. Send to Python FastAPI backend
     try {
       await fetch(`${API_BASE_URL}/projects/${projectId}/apply-update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ raw_text: rawText, structured }),
       });
-      await fetchBackendProjects();
     } catch (err) {
-      // Local fallback execution
-      setProjects((prev) =>
-        prev.map((p) => {
-          if (p.id !== projectId) return p;
-          return {
-            ...p,
-            status: structured.project_status || p.status,
-            targetDate: structured.expected_completion || p.targetDate,
-            customerSummary: structured.customer_summary || p.customerSummary,
-            internalNotes: structured.blocker_summary
-              ? `AI Identified Blocker: ${structured.blocker_summary}`
-              : p.internalNotes,
-            lastUpdated: new Date().toISOString(),
-          };
-        })
-      );
-
-      if (structured.updates && structured.updates.length > 0) {
-        setTasks((prevTasks) => {
-          const updated = prevTasks.map((t) => {
-            if (t.projectId !== projectId) return t;
-            const match = structured.updates?.find((u) => u.task.toLowerCase() === t.title.toLowerCase());
-            if (match) {
-              return {
-                ...t,
-                status: match.status,
-                blocker: match.blocker || (match.status === 'BLOCKED' ? 'Blocked by dependency' : undefined),
-              };
-            }
-            return t;
-          });
-          recalculateProgress(projectId, updated);
-          return updated;
-        });
-      }
-
-      const newActivity: Activity = {
-        id: `act-${Date.now()}`,
-        projectId,
-        source: 'AI',
-        title: 'AI Processed Customer Update',
-        description: `Status updated to ${structured.project_status || 'Current'}. ${structured.updates?.length || 0} task(s) updated.`,
-        timestamp: new Date().toISOString(),
-        author: 'AI Update System',
-        rawText,
-        changesApplied: true,
-        structuredUpdate: structured,
-      };
-      setActivities((prev) => [newActivity, ...prev]);
+      // Local state is already updated seamlessly
     }
   };
+
 
   // Trigger Linear Webhook (Real FastAPI backend or local React state fallback)
   const triggerLinearWebhook = async (taskTitle: string, newStatus: TaskStatus, blockerNote?: string) => {

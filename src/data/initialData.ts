@@ -30,12 +30,13 @@ export const INITIAL_PROJECTS: Project[] = [
     status: 'ON_TRACK',
     startDate: '2026-08-01',
     targetDate: '2026-08-30',
-    progress: 73, // 8 of 11 tasks completed = 73%
+    progress: 44, // 4 of 9 tasks completed = 44%
     lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     ownerIds: ['u1', 'u2'],
-    internalNotes: 'Customer API credentials pending for live telematics stream, but mock testing is completed.',
-    customerSummary: 'Integration testing is in progress. Drone navigation & waypoint dispatch systems verified.',
+    internalNotes: 'Customer API credentials pending for live telematics stream. Mock testing completed.',
+    customerSummary: 'Milestone 1 (Discovery) completed. API configuration verified. Awaiting access credentials.',
   },
+
   {
     id: 'p2',
     customerId: 'c2',
@@ -176,16 +177,15 @@ export const INITIAL_MILESTONES: Milestone[] = [
 ];
 
 export const INITIAL_TASKS: Task[] = [
-  // Project 1 Tasks (Drone Fleet Deployment) - 8 Done, 1 In Progress, 1 Blocked, 1 Scheduled (8/11 = 73%)
+  // Project 1 Tasks (Drone Fleet Deployment) - 4 Done, 1 In Progress, 1 Blocked, 3 Not Started (4/9 = 44%)
   { id: 't1-1', milestoneId: 'm1-1', projectId: 'p1', title: 'Requirements gathering', customerFacingTitle: 'Requirements & Scope Finalization', ownerId: 'u1', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-04' },
   { id: 't1-2', milestoneId: 'm1-1', projectId: 'p1', title: 'Customer approval signoff', customerFacingTitle: 'Architecture Approval Signoff', ownerId: 'u1', status: 'DONE', priority: 'MEDIUM', dueDate: '2026-08-07' },
   { id: 't1-3', milestoneId: 'm1-1', projectId: 'p1', title: 'Architecture review', customerFacingTitle: 'System Architecture Verification', ownerId: 'u2', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-10' },
 
   { id: 't1-4', milestoneId: 'm1-2', projectId: 'p1', title: 'API configuration', customerFacingTitle: 'API Gateway Configuration', ownerId: 'u1', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-12' },
-  { id: 't1-5', milestoneId: 'm1-2', projectId: 'p1', title: 'Robot integration drivers', customerFacingTitle: 'Drone Fleet Telemetry Drivers', ownerId: 'u2', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-18' },
-  { id: 't1-6', milestoneId: 'm1-2', projectId: 'p1', title: 'Sensor telemetry calibration', customerFacingTitle: 'Live Telemetry Calibration', ownerId: 'u2', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-19' },
+  { id: 't1-5', milestoneId: 'm1-2', projectId: 'p1', title: 'Robot integration drivers', customerFacingTitle: 'Drone Fleet Telemetry Drivers', ownerId: 'u2', status: 'IN_PROGRESS', priority: 'HIGH', dueDate: '2026-08-18' },
   {
-    id: 't1-7',
+    id: 't1-6',
     milestoneId: 'm1-2',
     projectId: 'p1',
     title: 'Mission dispatch setup',
@@ -197,12 +197,13 @@ export const INITIAL_TASKS: Task[] = [
     blocker: 'Customer has not provided API credentials. Escalate to account manager.',
     customerBlockerReason: 'Waiting for required access information.',
   },
-  { id: 't1-8', milestoneId: 'm1-2', projectId: 'p1', title: 'Integration testing', customerFacingTitle: 'End-to-End Integration Testing', ownerId: 'u2', status: 'IN_PROGRESS', priority: 'MEDIUM', dueDate: '2026-08-22' },
-  { id: 't1-9', milestoneId: 'm1-3', projectId: 'p1', title: 'Production setup', customerFacingTitle: 'Production Environment Deployment', ownerId: 'u1', status: 'DONE', priority: 'HIGH', dueDate: '2026-08-26' },
-  { id: 't1-10', milestoneId: 'm1-4', projectId: 'p1', title: 'Admin training session', customerFacingTitle: 'Administrator Training Workshop', ownerId: 'u1', status: 'DONE', priority: 'LOW', dueDate: '2026-08-29' },
-  { id: 't1-11', milestoneId: 'm1-4', projectId: 'p1', title: 'Operator training session', customerFacingTitle: 'Operator Certification & Handover', ownerId: 'u2', status: 'NOT_STARTED', priority: 'LOW', dueDate: '2026-08-30' },
+  { id: 't1-7', milestoneId: 'm1-2', projectId: 'p1', title: 'Integration testing', customerFacingTitle: 'End-to-End Integration Testing', ownerId: 'u2', status: 'NOT_STARTED', priority: 'MEDIUM', dueDate: '2026-08-22' },
+
+  { id: 't1-8', milestoneId: 'm1-3', projectId: 'p1', title: 'Production setup', customerFacingTitle: 'Production Environment Deployment', ownerId: 'u1', status: 'NOT_STARTED', priority: 'HIGH', dueDate: '2026-08-26' },
+  { id: 't1-9', milestoneId: 'm1-3', projectId: 'p1', title: 'Site validation & handover', customerFacingTitle: 'Site Acceptance & Handover', ownerId: 'u2', status: 'NOT_STARTED', priority: 'HIGH', dueDate: '2026-08-28' },
 
   // Project 2 Tasks (Warehouse Automation)
+
   { id: 't2-1', milestoneId: 'm2-1', projectId: 'p2', title: 'Conveyor mapping spec', customerFacingTitle: 'Conveyor System Mapping Specification', ownerId: 'u3', status: 'DONE', priority: 'HIGH', dueDate: '2026-07-25' },
   {
     id: 't2-2',

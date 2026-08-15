@@ -238,27 +238,28 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
             <Bot size={20} />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)' }}>
                 Synthetic Update Ingestion Inbox
               </h3>
-              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(249, 115, 22, 0.15)', color: '#f97316', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                ⚡ Groq API Ready
-              </span>
-              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ fontSize: '0.7rem', padding: '3px 9px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                 <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-                LIVE FEED
+                AI Provider: ● Connected (Groq Llama 3.3 70B)
+              </span>
+              <span style={{ fontSize: '0.7rem', padding: '3px 9px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#818cf8' }}></span>
+                Linear Webhook: ⚡ Listener Active (/api/webhooks/linear)
               </span>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Processes multi-channel communications (Emails, Slack, Calls) with high-speed Groq Llama-3 LLM
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Transforms multi-channel communications (Emails, Slack, Call Transcripts) into structured project state with human-in-the-loop review
             </p>
           </div>
 
         </div>
 
-        {/* Live Simulation Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Action / Simulation Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button
             type="button"
             className="btn btn-ghost"
@@ -281,13 +282,14 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
             }}
           >
             {isSimulatingStream ? <RefreshCw size={13} className="spin" /> : <Play size={13} />}
-            <span>{isSimulatingStream ? 'Simulating Live Stream...' : '▶ Simulate Live Stream'}</span>
+            <span>{isSimulatingStream ? 'Streaming...' : '▶ Simulate Live Feed'}</span>
           </button>
 
           <button
             type="button"
             className="btn btn-ghost"
             onClick={() => triggerLinearWebhook('Robot integration drivers', 'DONE')}
+            title="Simulates an incoming webhook event payload from Linear"
             style={{
               fontSize: '0.78rem',
               padding: '6px 12px',
@@ -302,10 +304,11 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
             }}
           >
             <Zap size={13} />
-            <span>⚡ Linear Webhook</span>
+            <span>Simulate Linear Webhook</span>
           </button>
         </div>
       </div>
+
 
       {/* Real-time Stream Ticker Display */}
       {streamLog.length > 0 && (
@@ -482,103 +485,156 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
         </div>
       </div>
 
-      {/* Structured Extraction Result Card */}
+      {/* Structured Extraction Result Card (Preview-Before-Apply) */}
       {extractedResult && (
         <div
+          className="glass-panel"
           style={{
             marginTop: '20px',
-            padding: '18px 20px',
-            borderRadius: 'var(--radius-sm)',
-            background: 'var(--bg-primary)',
-            border: '1.5px solid rgba(139, 92, 246, 0.4)',
+            padding: '20px 24px',
+            borderRadius: 'var(--radius-md)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%)',
+            border: '2px solid rgba(139, 92, 246, 0.5)',
+            boxShadow: '0 8px 32px rgba(139, 92, 246, 0.15)',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles size={16} color="#c084fc" />
-              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                Extracted Delivery Intelligence
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              {extractedResult.engine && (
-                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '10px', background: 'rgba(139, 92, 246, 0.18)', color: '#c084fc', fontWeight: 600 }}>
-                  ⚡ {extractedResult.engine}
+          {/* Card Title Banner */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '1px solid rgba(139, 92, 246, 0.2)', paddingBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={18} color="#c084fc" />
+                <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                  AI Extracted Update (Preview)
                 </span>
-              )}
-              <span style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontWeight: 600 }}>
-                {Math.round((extractedResult.confidence || 0.94) * 100)}% AI Confidence
-              </span>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: extractedResult.project_status === 'BLOCKED' ? '#ef4444' : extractedResult.project_status === 'AT_RISK' ? '#f59e0b' : '#10b981' }}>
-                Health Projection: {extractedResult.project_status || 'ON_TRACK'}
-              </span>
+              </div>
+              <div style={{ fontSize: '0.82rem', color: '#60a5fa', fontWeight: 600, marginTop: '2px' }}>
+                Project: {project.name}
+              </div>
             </div>
 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: '10px', background: 'rgba(139, 92, 246, 0.2)', color: '#c084fc', fontWeight: 700 }}>
+                ⚡ {extractedResult.engine || 'Groq Llama-3.3-70B'}
+              </span>
+              <span style={{ fontSize: '0.75rem', padding: '3px 9px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.18)', color: '#10b981', fontWeight: 700 }}>
+                Confidence: {Math.round((extractedResult.confidence || 0.94) * 100)}%
+              </span>
+            </div>
           </div>
 
-          {/* Detected Task Updates */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
+          {/* Detected Task State Updates (Before -> After) */}
+          <div style={{ marginBottom: '14px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
+              Detected Task State Updates:
+            </div>
             {extractedResult.updates && extractedResult.updates.length > 0 ? (
-              extractedResult.updates.map((u, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-color)',
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {u.status === 'DONE' && <CheckCircle2 size={14} color="#10b981" />}
-                    {u.status === 'BLOCKED' && <AlertTriangle size={14} color="#ef4444" />}
-                    {u.status === 'IN_PROGRESS' && <Clock size={14} color="#3b82f6" />}
-                    <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{u.task_title || u.task}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className={`status-badge ${u.status}`}>
-                      ● {u.status}
-                    </span>
-                  </div>
-                </div>
-              ))
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {extractedResult.updates.map((u, idx) => {
+                  const existingTask = projectTasks.find(
+                    (t) =>
+                      t.title.toLowerCase().trim() === (u.task_title || u.task).toLowerCase().trim() ||
+                      t.title.toLowerCase().includes((u.task_title || u.task).toLowerCase()) ||
+                      (u.task_title || u.task).toLowerCase().includes(t.title.toLowerCase())
+                  );
+                  const oldStatus = existingTask ? existingTask.status.replace('_', ' ') : 'IN PROGRESS';
+
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '10px 14px',
+                        borderRadius: '6px',
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--border-color)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '0.9rem' }}>
+                          {existingTask ? existingTask.title : u.task_title || u.task}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>{oldStatus}</span>
+                          <ArrowRight size={14} color="#a78bfa" />
+                          <span className={`status-badge ${u.status}`} style={{ fontWeight: 800 }}>
+                            ● {u.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Blocker Note on Task */}
+                      {(u.blocker || (u.status === 'BLOCKED' && extractedResult.blockers?.[0])) && (
+                        <div style={{ fontSize: '0.78rem', color: '#ef4444', marginTop: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <AlertTriangle size={13} />
+                          <span>Blocker: {u.blocker || extractedResult.blockers?.[0]}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                No direct task state movement detected in text. Summary updated.
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '8px' }}>
+                No task transitions detected in text. Summary will be updated.
               </div>
             )}
           </div>
 
-          {/* Blockers */}
+          {/* Project Health Impact Comparison */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: '6px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              Project Health Impact:
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+              <span className={`status-badge ${project.status}`}>
+                {project.status.replace('_', ' ')}
+              </span>
+              <ArrowRight size={14} color="#a78bfa" />
+              <span className={`status-badge ${extractedResult.project_status || project.status}`} style={{ fontWeight: 800 }}>
+                {extractedResult.project_status ? extractedResult.project_status.replace('_', ' ') : project.status.replace('_', ' ')}
+              </span>
+            </div>
+          </div>
+
+          {/* Customer Requested Action / Blocker summary */}
           {extractedResult.blockers && extractedResult.blockers.length > 0 && (
-            <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', marginBottom: '14px', fontSize: '0.8rem', color: '#ef4444' }}>
-              <strong>Blocker Identified:</strong> {extractedResult.blockers.join(', ')}
+            <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', marginBottom: '14px', fontSize: '0.82rem', color: '#ef4444' }}>
+              <strong>Blocker Summary:</strong> {extractedResult.blockers.join(', ')}
             </div>
           )}
 
-          {/* Customer Summary Preview */}
+          {/* Customer-Safe Summary Preview */}
           {extractedResult.customer_summary && (
-            <div style={{ padding: '10px 14px', borderRadius: '6px', background: 'rgba(37, 99, 235, 0.05)', border: '1px solid rgba(37, 99, 235, 0.2)', marginBottom: '16px', fontSize: '0.8rem', color: 'var(--text-main)' }}>
-              <strong>Generated Customer Summary:</strong> {extractedResult.customer_summary}
+            <div style={{ padding: '12px 14px', borderRadius: '6px', background: 'rgba(37, 99, 235, 0.06)', border: '1px solid rgba(37, 99, 235, 0.25)', marginBottom: '16px' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', marginBottom: '4px' }}>
+                Sanitized Customer Portal Summary:
+              </div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
+                {extractedResult.customer_summary}
+              </div>
             </div>
           )}
 
-          {/* Action Row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <button
-              type="button"
-              className="btn btn-ghost"
-              onClick={() => setShowJsonCode(!showJsonCode)}
-              style={{ fontSize: '0.78rem', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}
-            >
-              <Code2 size={13} />
-              <span>{showJsonCode ? 'Hide JSON Schema' : '{ } View JSON Schema'}</span>
-            </button>
+          {/* Action Row: Reject / Discard vs Apply Changes */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '10px', borderTop: '1px solid rgba(139, 92, 246, 0.2)' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setExtractedResult(null)}
+                style={{ fontSize: '0.82rem', padding: '7px 14px', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+              >
+                ✕ Discard / Reject
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setShowJsonCode(!showJsonCode)}
+                style={{ fontSize: '0.78rem', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}
+              >
+                <Code2 size={13} />
+                <span>{showJsonCode ? 'Hide JSON' : '{ } View JSON'}</span>
+              </button>
+            </div>
 
             <button
               type="button"
@@ -586,14 +642,15 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
               onClick={handleApplyChanges}
               disabled={isApplied}
               style={{
-                fontSize: '0.85rem',
-                padding: '8px 20px',
-                background: isApplied ? '#10b981' : '#2563eb',
+                fontSize: '0.88rem',
+                padding: '9px 24px',
+                background: isApplied ? '#10b981' : 'linear-gradient(135deg, #10b981, #059669)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                fontWeight: 700,
+                fontWeight: 800,
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
               }}
             >
               {isApplied ? (
@@ -603,8 +660,8 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
                 </>
               ) : (
                 <>
-                  <Send size={14} />
-                  <span>Apply Updates to Project State</span>
+                  <Check size={16} />
+                  <span>✓ Apply Changes to Project</span>
                 </>
               )}
             </button>
@@ -615,7 +672,7 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
             <pre
               className="json-preview"
               style={{
-                marginTop: '12px',
+                marginTop: '14px',
                 padding: '12px',
                 background: '#090d16',
                 border: '1px solid var(--border-color)',
@@ -633,3 +690,4 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
     </div>
   );
 };
+

@@ -8,14 +8,22 @@ import { ActivityTab } from './ActivityTab';
 import { DocumentsTab } from './DocumentsTab';
 
 export const ProjectDetail: React.FC = () => {
-  const { selectedProjectId, setSelectedProjectId, projects, customers, users, viewMode, setViewMode } = useProjectContext();
+  const { selectedProjectId, setSelectedProjectId, projects, customers, users, viewMode, setViewMode, tasks } = useProjectContext();
   const [activeTab, setActiveTab] = useState<'overview' | 'milestones' | 'issues' | 'activity' | 'documents'>('overview');
+
 
   const project = projects.find((p) => p.id === selectedProjectId);
   if (!project) return null;
 
   const customer = customers.find((c) => c.id === project.customerId);
   const owners = users.filter((u) => project.ownerIds.includes(u.id));
+
+  const projectTasks = tasks.filter((t) => t.projectId === project.id);
+  const completedTasksCount = projectTasks.filter((t) => t.status === 'DONE').length;
+  const computedProgress = projectTasks.length > 0
+    ? Math.round((completedTasksCount / projectTasks.length) * 100)
+    : project.progress;
+
 
   // Calculate days remaining
   const daysRemaining = Math.max(
@@ -112,7 +120,7 @@ export const ProjectDetail: React.FC = () => {
                 ● {viewMode === 'internal' ? project.status.replace('_', ' ') : (project.status === 'ON_TRACK' ? 'On Track' : project.status === 'BLOCKED' ? 'Action Needed' : project.status === 'AT_RISK' ? 'In Progress' : 'Completed')}
               </span>
               <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                {project.progress}% Complete
+                {computedProgress}% Complete
               </span>
             </div>
 

@@ -80,6 +80,16 @@ export const ActivityTab: React.FC<ActivityTabProps> = ({ project }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
           {projectActivities.map((act) => {
             const isAI = act.source === 'AI' || act.source === 'Email' || act.source === 'Slack' || act.source === 'Call';
+            const isLinear = act.source === 'Linear';
+
+            // Customer View Filter: In customer view, sanitize title and description
+            const displayTitle = viewMode === 'customer'
+              ? (act.title.includes('AI') ? 'Delivery Progress Synchronized' : act.title.includes('Status Changed') ? 'Schedule Alignment Updated' : act.title)
+              : act.title;
+
+            const displayDescription = viewMode === 'customer' && isAI && project.customerSummary
+              ? project.customerSummary
+              : act.description;
 
             return (
               <div
@@ -88,8 +98,8 @@ export const ActivityTab: React.FC<ActivityTabProps> = ({ project }) => {
                   display: 'flex',
                   gap: '14px',
                   padding: '14px 16px',
-                  background: isAI && viewMode === 'internal' ? 'rgba(139, 92, 246, 0.04)' : 'var(--bg-primary)',
-                  border: isAI && viewMode === 'internal' ? '1px solid rgba(139, 92, 246, 0.2)' : '1px solid var(--border-color)',
+                  background: isAI && viewMode === 'internal' ? 'rgba(139, 92, 246, 0.04)' : isLinear && viewMode === 'internal' ? 'rgba(99, 102, 241, 0.04)' : 'var(--bg-primary)',
+                  border: isAI && viewMode === 'internal' ? '1px solid rgba(139, 92, 246, 0.25)' : isLinear && viewMode === 'internal' ? '1px solid rgba(99, 102, 241, 0.25)' : '1px solid var(--border-color)',
                   borderRadius: 'var(--radius-sm)',
                 }}
               >
@@ -98,8 +108,8 @@ export const ActivityTab: React.FC<ActivityTabProps> = ({ project }) => {
                     width: '34px',
                     height: '34px',
                     borderRadius: '50%',
-                    background: isAI && viewMode === 'internal' ? 'rgba(139, 92, 246, 0.18)' : 'rgba(37, 99, 235, 0.1)',
-                    color: isAI && viewMode === 'internal' ? '#c084fc' : '#2563eb',
+                    background: isAI && viewMode === 'internal' ? 'rgba(139, 92, 246, 0.18)' : isLinear && viewMode === 'internal' ? 'rgba(99, 102, 241, 0.18)' : 'rgba(37, 99, 235, 0.1)',
+                    color: isAI && viewMode === 'internal' ? '#c084fc' : isLinear && viewMode === 'internal' ? '#818cf8' : '#2563eb',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -107,27 +117,25 @@ export const ActivityTab: React.FC<ActivityTabProps> = ({ project }) => {
                     marginTop: '2px',
                   }}
                 >
-                  {isAI && viewMode === 'internal' ? <Sparkles size={16} /> : <CheckCircle2 size={16} />}
+                  {isAI && viewMode === 'internal' ? <Sparkles size={16} /> : isLinear && viewMode === 'internal' ? <CheckCircle2 size={16} /> : <CheckCircle2 size={16} />}
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                        {viewMode === 'customer' && isAI ? 'Delivery Status Synchronized' : act.title}
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>
+                        {displayTitle}
                       </span>
                       {viewMode === 'internal' && renderSourceBadge(act.source)}
                     </div>
 
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)' }}>
-                      {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(act.timestamp).toLocaleDateString()}
+                      {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(act.timestamp).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </span>
                   </div>
 
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                    {viewMode === 'customer' && isAI && project.customerSummary
-                      ? project.customerSummary
-                      : act.description}
+                    {displayDescription}
                   </div>
 
                   {/* Raw Text Log (Internal view only) */}
@@ -140,6 +148,7 @@ export const ActivityTab: React.FC<ActivityTabProps> = ({ project }) => {
               </div>
             );
           })}
+
 
           {projectActivities.length === 0 && (
             <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontStyle: 'italic' }}>

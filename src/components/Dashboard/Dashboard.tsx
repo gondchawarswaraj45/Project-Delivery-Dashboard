@@ -415,6 +415,10 @@ export const Dashboard: React.FC = () => {
               const stale = isProjectStale(p);
               const daysDiff = Math.floor((Date.now() - new Date(p.lastUpdated).getTime()) / (1000 * 60 * 60 * 24));
 
+              const pTasks = tasks.filter((t) => t.projectId === p.id);
+              const pCompleted = pTasks.filter((t) => t.status === 'DONE').length;
+              const pProgress = pTasks.length > 0 ? Math.round((pCompleted / pTasks.length) * 100) : p.progress;
+
               return (
                 <tr key={p.id} onClick={() => setSelectedProjectId(p.id)}>
                   {/* Project Name & Description */}
@@ -468,19 +472,20 @@ export const Dashboard: React.FC = () => {
                           fill="none"
                           stroke={p.status === 'ON_TRACK' ? '#10b981' : p.status === 'AT_RISK' ? '#f59e0b' : p.status === 'BLOCKED' ? (viewMode === 'internal' ? '#ef4444' : '#f59e0b') : '#3b82f6'}
                           strokeWidth="3.5"
-                          strokeDasharray={`${p.progress}, 100`}
+                          strokeDasharray={`${pProgress}, 100`}
                           strokeLinecap="round"
                         />
                       </svg>
-                      <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>{p.progress}%</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-main)' }}>{pProgress}%</span>
                     </div>
                     <div className="progress-bar-container">
                       <div
                         className={`progress-bar-fill ${p.status === 'AT_RISK' ? 'at-risk' : p.status === 'BLOCKED' ? (viewMode === 'internal' ? 'blocked' : 'at-risk') : ''}`}
-                        style={{ width: `${p.progress}%` }}
+                        style={{ width: `${pProgress}%` }}
                       />
                     </div>
                   </td>
+
 
                   {/* Status Badge */}
                   <td>
