@@ -15,7 +15,9 @@ import {
 import { useProjectContext } from '../../context/ProjectContext';
 import { Project, NaturalLanguageQueryResult } from '../../types';
 import { processNaturalLanguageQuery } from '../../utils/nlQuery';
+import { API_BASE_URL } from '../../utils/apiConfig';
 import { NewProjectModal } from './NewProjectModal';
+
 
 export const Dashboard: React.FC = () => {
   const { projects, customers, users, setSelectedProjectId, tasks, viewMode, setViewMode } = useProjectContext();
@@ -80,11 +82,12 @@ export const Dashboard: React.FC = () => {
     setIsNlLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/nl-query', {
+      const response = await fetch(`${API_BASE_URL}/nl-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: nlQueryInput.trim() }),
       });
+
       if (response.ok) {
         const data = await response.json();
         setNlResult(data);

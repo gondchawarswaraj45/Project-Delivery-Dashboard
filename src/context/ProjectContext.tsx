@@ -25,7 +25,8 @@ import {
 
 export type ViewMode = 'internal' | 'customer';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+import { API_BASE_URL } from '../utils/apiConfig';
+
 
 interface ProjectContextType {
   projects: Project[];

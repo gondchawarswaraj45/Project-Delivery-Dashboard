@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Project, Task, StructuredUpdate, ViewMode } from '../../types';
 import { useProjectContext } from '../../context/ProjectContext';
 import { extractStructuredUpdate } from '../../utils/aiExtractor';
+import { API_BASE_URL } from '../../utils/apiConfig';
+
 import {
   Sparkles,
   ArrowRight,
@@ -175,11 +177,12 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
     setIsApplied(false);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/projects/${project.id}/ai-update`, {
+      const response = await fetch(`${API_BASE_URL}/projects/${project.id}/ai-update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ raw_text: rawText }),
       });
+
       if (response.ok) {
         const data = await response.json();
         setExtractedResult(data);
