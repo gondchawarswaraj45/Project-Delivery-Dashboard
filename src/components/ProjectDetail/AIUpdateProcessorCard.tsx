@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Project, Task, StructuredUpdate, ViewMode } from '../../types';
+import { Project, StructuredUpdate, ViewMode } from '../../types';
 import { useProjectContext } from '../../context/ProjectContext';
 import { extractStructuredUpdate } from '../../utils/aiExtractor';
 import { API_BASE_URL } from '../../utils/apiConfig';
@@ -7,11 +7,9 @@ import { API_BASE_URL } from '../../utils/apiConfig';
 import {
   Sparkles,
   ArrowRight,
-  CheckCircle2,
   AlertTriangle,
-  Clock,
+  CheckCircle2,
   RefreshCw,
-  Send,
   Check,
   Mail,
   MessageSquare,
@@ -19,10 +17,11 @@ import {
   Edit3,
   Bot,
   Play,
-  Pause,
   Zap,
   Code2
 } from 'lucide-react';
+
+
 
 interface AIUpdateProcessorCardProps {
   project: Project;
@@ -190,10 +189,11 @@ export const AIUpdateProcessorCard: React.FC<AIUpdateProcessorCardProps> = ({ pr
         const fallback = extractStructuredUpdate(rawText, project, projectTasks);
         setExtractedResult(fallback);
       }
-    } catch (err) {
+    } catch {
       const fallback = extractStructuredUpdate(rawText, project, projectTasks);
       setExtractedResult(fallback);
     } finally {
+
       setIsProcessing(false);
     }
   };

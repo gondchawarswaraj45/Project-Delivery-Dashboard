@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle2, PlayCircle, AlertTriangle, Circle, ArrowRight } from 'lucide-react';
+import { CheckCircle2, PlayCircle, AlertTriangle } from 'lucide-react';
 import { Milestone, Task } from '../../types';
+
 
 interface RoadmapProps {
   milestones: Milestone[];

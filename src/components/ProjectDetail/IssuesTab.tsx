@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { AlertCircle, Plus, Filter, User, Tag, CheckCircle2 } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import { useProjectContext } from '../../context/ProjectContext';
-import { Project, IssueCategory, IssueStatus } from '../../types';
+import { Project, IssueCategory } from '../../types';
+
 
 interface IssuesTabProps {
   project: Project;
@@ -247,6 +248,26 @@ export const IssuesTab: React.FC<IssuesTabProps> = ({ project }) => {
                   </select>
                 </div>
               </div>
+
+              {viewMode === 'internal' && (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                    Assignee / Owner
+                  </label>
+                  <select
+                    value={ownerId}
+                    onChange={(e) => setOwnerId(e.target.value)}
+                    style={{ width: '100%', padding: '10px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '4px', color: 'var(--text-main)' }}
+                  >
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name} ({u.role})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
 
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '6px' }}>

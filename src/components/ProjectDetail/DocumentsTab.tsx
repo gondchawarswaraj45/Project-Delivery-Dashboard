@@ -1,6 +1,7 @@
 import React from 'react';
-import { FileText, Download, Eye, EyeOff, Lock, FileCode, Paperclip } from 'lucide-react';
+import { FileText, Download, Eye, EyeOff } from 'lucide-react';
 import { useProjectContext } from '../../context/ProjectContext';
+
 import { Project } from '../../types';
 
 interface DocumentsTabProps {

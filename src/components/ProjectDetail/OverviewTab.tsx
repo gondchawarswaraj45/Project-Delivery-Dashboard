@@ -3,14 +3,15 @@ import { Project } from '../../types';
 import { useProjectContext } from '../../context/ProjectContext';
 import { MilestoneDeliveryPipeline } from './MilestoneDeliveryPipeline';
 import { AIUpdateProcessorCard } from './AIUpdateProcessorCard';
-import { CheckCircle2, Clock, AlertTriangle, Activity as ActivityIcon, ShieldAlert } from 'lucide-react';
+import { Activity as ActivityIcon } from 'lucide-react';
+
 
 interface OverviewTabProps {
   project: Project;
 }
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({ project }) => {
-  const { milestones, tasks, issues, activities, viewMode } = useProjectContext();
+  const { milestones, tasks, activities, viewMode } = useProjectContext();
 
   const projectMilestones = milestones.filter((m) => m.projectId === project.id);
   const projectTasks = tasks.filter((t) => t.projectId === project.id);
@@ -25,10 +26,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ project }) => {
   const blockedPct = Math.round((blockedTasks / totalTasks) * 100);
   const notStartedPct = Math.max(0, 100 - donePct - inProgPct - blockedPct);
 
-  const openInternalIssues = issues.filter((i) => i.projectId === project.id && i.status !== 'Resolved');
-  const openCustomerIssues = issues.filter((i) => i.projectId === project.id && !i.internalOnly && i.status !== 'Resolved');
-
   const projectActivities = activities.filter((a) => a.projectId === project.id).slice(0, 3);
+
 
   // Relative time format
   const formatLastUpdated = (dateStr: string) => {

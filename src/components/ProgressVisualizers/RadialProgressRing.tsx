@@ -1,5 +1,6 @@
 import React from 'react';
-import { Project, Task } from '../../types';
+import { Task } from '../../types';
+
 
 interface RadialProps {
   percentage: number;

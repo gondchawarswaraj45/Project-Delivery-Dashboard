@@ -2,7 +2,8 @@ import React from 'react';
 import { Project } from '../../types';
 import { useProjectContext } from '../../context/ProjectContext';
 import { AIUpdateProcessorCard } from './AIUpdateProcessorCard';
-import { Sparkles, CheckCircle2, Clock, Mail, MessageSquare, PhoneCall, Bot, User, Check } from 'lucide-react';
+import { Sparkles, CheckCircle2, Mail, MessageSquare, PhoneCall, User } from 'lucide-react';
+
 
 interface ActivityTabProps {
   project: Project;

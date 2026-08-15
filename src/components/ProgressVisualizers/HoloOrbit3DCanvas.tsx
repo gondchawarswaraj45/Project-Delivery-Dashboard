@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Project, Task } from '../../types';
-import { Orbit, Sparkles, RefreshCw } from 'lucide-react';
+import { Orbit, RefreshCw } from 'lucide-react';
+
 
 interface HoloOrbitProps {
   project: Project;

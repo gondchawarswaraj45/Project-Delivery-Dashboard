@@ -79,7 +79,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setProjects(data);
         setIsBackendConnected(true);
       }
-    } catch (err) {
+    } catch {
       setIsBackendConnected(false);
     }
   };
@@ -128,10 +128,11 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ]);
           }
         }
-      } catch (e) {
+      } catch {
         // Fallback to local state
       }
     };
+
 
     loadDetail();
   }, [selectedProjectId]);
@@ -184,7 +185,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
 
     // 3. Immediately update matching tasks
-    let updatedTasksList: Task[] = [];
     const taskChangeDetails: string[] = [];
 
     if (structured.updates && structured.updates.length > 0) {
@@ -208,7 +208,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
           return t;
         });
-        updatedTasksList = updated;
         recalculateProgress(projectId, updated);
         return updated;
       });
@@ -261,10 +260,11 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ raw_text: rawText, structured }),
       });
-    } catch (err) {
+    } catch {
       // Local state is already updated seamlessly
     }
   };
+
 
 
   // Trigger Linear Webhook (Real FastAPI backend or local React state fallback)
@@ -289,8 +289,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         body: JSON.stringify(payload),
       });
       await fetchBackendProjects();
-    } catch (e) {
+    } catch {
       // Local fallback for offline demo
+
       let targetProjectId = '';
       setTasks((prev) => {
         const updated = prev.map((t) => {
@@ -386,8 +387,9 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       await fetch(`${API_BASE_URL}/reset-demo`, { method: 'POST' });
       await fetchBackendProjects();
-    } catch (e) {
+    } catch {
       setProjects(INITIAL_PROJECTS);
+
       setMilestones(INITIAL_MILESTONES);
       setTasks(INITIAL_TASKS);
       setIssues(INITIAL_ISSUES);

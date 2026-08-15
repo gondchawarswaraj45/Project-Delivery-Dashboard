@@ -41,8 +41,9 @@ export const IsometricTower3D: React.FC<IsometricTowerProps> = ({ project, miles
             </h4>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Volumetric stacked architecture — Move mouse to tilt in 3D perspective space
+            Volumetric stacked architecture for {project.name} — Move mouse to tilt in 3D space
           </p>
+
         </div>
 
         <button

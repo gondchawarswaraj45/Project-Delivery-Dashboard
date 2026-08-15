@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import {
   Search,
   Plus,
-  AlertTriangle,
   Sparkles,
   Bot,
   Clock,
   ChevronRight,
   Filter,
-  CheckCircle2,
-  XCircle,
   RefreshCw,
 } from 'lucide-react';
+
 import { useProjectContext } from '../../context/ProjectContext';
 import { Project, NaturalLanguageQueryResult } from '../../types';
 import { processNaturalLanguageQuery } from '../../utils/nlQuery';
@@ -95,10 +93,11 @@ export const Dashboard: React.FC = () => {
         const fallback = processNaturalLanguageQuery(nlQueryInput, projects, tasks, users);
         setNlResult(fallback);
       }
-    } catch (err) {
+    } catch {
       const fallback = processNaturalLanguageQuery(nlQueryInput, projects, tasks, users);
       setNlResult(fallback);
     } finally {
+
       setIsNlLoading(false);
     }
   };

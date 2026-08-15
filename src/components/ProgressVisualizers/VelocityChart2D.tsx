@@ -9,9 +9,8 @@ interface VelocityChartProps {
 export const VelocityChart2D: React.FC<VelocityChartProps> = ({ project, tasks }) => {
   const totalTasks = Math.max(tasks.length, 1);
   const doneTasks = tasks.filter(t => t.status === 'DONE').length;
-  const inProgressTasks = tasks.filter(t => t.status === 'IN_PROGRESS').length;
-
   const currentPct = Math.round((doneTasks / totalTasks) * 100);
+
 
   // SVG dimensions
   const width = 600;
@@ -97,8 +96,9 @@ export const VelocityChart2D: React.FC<VelocityChartProps> = ({ project, tasks }
             Target: {project.targetDate}
           </text>
           <text x={currentX} y={Math.max(16, currentY - 12)} fontSize="11" fontWeight="bold" fill="var(--text-main)" textAnchor="middle">
-            {doneTasks} Done ({project.progress}%)
+            {doneTasks} Done ({currentPct}%)
           </text>
+
           <text x={startX + 4} y={targetY + 4} fontSize="9" fill="var(--text-muted)">
             100% Scope ({totalTasks} tasks)
           </text>
