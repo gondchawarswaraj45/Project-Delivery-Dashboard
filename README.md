@@ -1,37 +1,49 @@
-The Challenge
-Once a customer signs on, delivery work (onboarding, implementation milestones, ongoing project tasks) is tracked internally as projects, each broken into milestones and tasks, often with more than one owner. But progress updates arrive scattered across chat, email, and calls, with no single place where a customer or internal stakeholder can see full status. There is currently no unified view, internal or customer-facing, and no automatic way to turn an unstructured update into structured project status.
+# Project Delivery Dashboard
 
-Why It Matters
-Without a shared view, customers have no way to check status themselves, so they default to asking for it directly, which pulls a person into every status conversation. Every unstructured update that comes in over chat, email, or a call has to be manually read and translated into project state by that same person. That person becomes the bottleneck for anyone else who wants visibility, whether that is another internal team or the customer.
+## The Challenge
 
-Success Looks Like
-Build a project delivery dashboard that includes:
+Customer delivery work—onboarding, implementation milestones, and ongoing tasks—is tracked internally across projects, milestones, and tasks. However, progress updates are scattered across chats, emails, and calls, making it difficult for customers and internal teams to get a unified view of project status.
 
-Must Have
+## Why It Matters
 
-A projects overview screen listing every project, its owners (a project can have more than one), and its current status at a glance.
-A project detail view showing milestones and tasks, with clear open, blocked, and done states.
-Two distinct views of the same project: an internal view with full detail, and a customer-facing view that shows only what a customer should see.
-An issues panel on each project linking relevant tickets, using the provided issue category taxonomy (Bug / Feature Request / Question / Support / Implementation).
-An updates or activity feed per project that ingests unstructured update text (chat- or email-style) and shows it as structured, timestamped status entries.
-Bonus Points
+Without a shared dashboard, customers depend on people for status updates. Teams must manually read unstructured messages and convert them into project status, creating unnecessary work and a visibility bottleneck.
 
-Kanban-style view of milestones/tasks.
-Document vault attached to a project, visible in the customer-facing view.
-Flags projects with no status movement for an extended period.
-Natural-language query over project state (e.g. "which projects are behind schedule").
-Constraints & Scope
-Technology Requirements
+## Solution
 
-No specific technology stack, platform, or framework is required. Participants are free to build this however they choose.
-Data Assumptions
+A unified **Project Delivery Dashboard** that converts unstructured updates into structured project status while providing separate internal and customer-facing views.
 
-Participants create their own mock/synthetic data for projects, milestones, tasks, owners, and the unstructured updates feed. Using an AI tool to generate this mock data is expected and fine.
-No real FlytBase customer data may be used at any point.
-Demo Requirements
+### Core Features
 
-Live demo: show the internal view and the customer view side by side, making clear how everything lives and where everything lives: what data exists, and which view it surfaces in.
-Out of Scope (Optional Bonus)
+* Projects overview with **status and multiple owners**
+* Project details with **milestones and tasks**
+* Clear **Open, Blocked, and Done** states
+* Separate **Internal** and **Customer** views
+* Project issues with categories:
 
-Any live integration with real chat, email, or messaging systems.
-Real authentication or integration with FlytBase's actual production systems.
+  * Bug
+  * Feature Request
+  * Question
+  * Support
+  * Implementation
+* Activity feed that converts chat/email-style updates into **timestamped structured status entries**
+
+### Bonus Features
+
+* Kanban view for milestones and tasks
+* Project document vault
+* Stale-project detection and alerts
+* Natural-language project queries such as *"Which projects are behind schedule?"*
+
+## Data & Scope
+
+The system uses **mock/synthetic project data**, including projects, milestones, tasks, owners, issues, and unstructured updates. No real customer data is used.
+
+## Demo
+
+The demo showcases the **Internal View and Customer View side by side**, demonstrating what data exists, how it is processed, and which information is exposed to each audience.
+
+## Out of Scope
+
+* Live integration with chat, email, or messaging platforms
+* Production authentication
+* Integration with FlytBase production systems
